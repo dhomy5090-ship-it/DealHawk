@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="ديل هوك" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>ديل هوك V2.1 | DealHawk V2.1 - صائد العروض الذكي</title>
+  <title>ديل هوك V2.3 | DealHawk V2.3 - صائد العروض الذكي</title>
   <link id="appFavicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230ea5e9'/%3E%3Cstop offset='100%25' stop-color='%234f46e5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='28' fill='url(%23g)'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='rgba(255,255,255,0.22)' stroke-width='3'/%3E%3Cpath d='M30 68 C42 42, 65 34, 92 38 C78 48, 72 56, 84 64 C66 64, 54 72, 42 86 C44 74, 38 70, 30 68 Z' fill='%23ffffff'/%3E%3Ccircle cx='72' cy='47' r='3.5' fill='%230b1120'/%3E%3C/svg%3E" />
   <link id="appleTouchIcon" rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230ea5e9'/%3E%3Cstop offset='100%25' stop-color='%234f46e5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='28' fill='url(%23g)'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='rgba(255,255,255,0.22)' stroke-width='3'/%3E%3Cpath d='M30 68 C42 42, 65 34, 92 38 C78 48, 72 56, 84 64 C66 64, 54 72, 42 86 C44 74, 38 70, 30 68 Z' fill='%23ffffff'/%3E%3Ccircle cx='72' cy='47' r='3.5' fill='%230b1120'/%3E%3C/svg%3E" />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -93,7 +93,7 @@
       </div>
       <div class="space-y-3 text-xs">
         <div>
-          <label for="inputGeminiKey" class="block font-semibold text-slate-300 mb-1">مفتاح Gemini API (يبدأ بـ AIzaSy من Google AI Studio)</label>
+          <label for="inputGeminiKey" class="block font-semibold text-slate-300 mb-1">مفتاح Gemini API (يبدأ بـ AQ. أو AIzaSy من Google AI Studio)</label>
           <input id="inputGeminiKey" type="text" dir="ltr" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 outline-none focus:border-sky-500" />
         </div>
         <div>
@@ -170,7 +170,7 @@
             <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5 flex-wrap">
               <span>ديل هوك</span>
               <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/25">DealHawk</span>
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">V2.1</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">V2.3</span>
             </h1>
             <p class="text-[11px] sm:text-xs text-slate-400">رادار ذكي لمراقبة الأسعار واقتناص العروض الموثوقة</p>
           </div>
@@ -349,7 +349,7 @@
       // 1. Credentials & Configuration
       // ==========================================================
       const CONFIG = {
-        GEMINI_API_KEY: 'AIzaSyD8txuDk0Q1wMIBnvtyov1Gr5jGbF9I5cc',
+        GEMINI_API_KEY: 'AQ.Ab8RN6LBTA_FzUrWko5Ah9OdyBccWmMI5xneM2pAmdDrMewgNg',
         GOOGLE_SEARCH_KEY: 'AIzaSyD8txuDk0Q1wMIBnvtyov1Gr5jGbF9I5cc',
         SEARCH_CX: '01f3213eee3b64544',
         FIREBASE: {
@@ -379,10 +379,10 @@
           const encodedIcon = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
 
           const manifestObj = {
-            name: 'ديل هوك V2.1 - صائد العروض الذكي',
+            name: 'ديل هوك V2.3 - صائد العروض الذكي',
             short_name: 'ديل هوك',
             description: 'رادار ذكي لمراقبة الأسعار واقتناص العروض الموثوقة',
-            start_url: './DealHawk_V2.1.html',
+            start_url: './DealHawk_V2.3.html',
             display: 'standalone',
             orientation: 'portrait',
             background_color: '#0b1120',
@@ -896,13 +896,15 @@
         ].join('\n');
 
         const endpoint =
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' +
-          encodeURIComponent(CONFIG.GEMINI_API_KEY);
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent';
 
         // Try with google_search grounding tool first, fallback to standard generation if tool not supported by key
         let resp = await fetch(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': CONFIG.GEMINI_API_KEY
+          },
           body: JSON.stringify({
             contents: [{ parts: [{ text: promptText }] }],
             tools: [{ google_search: {} }],
@@ -915,7 +917,10 @@
         if (!resp.ok) {
           resp = await fetch(endpoint, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': CONFIG.GEMINI_API_KEY
+            },
             body: JSON.stringify({
               contents: [{ parts: [{ text: promptText }] }],
               generationConfig: {
@@ -993,12 +998,14 @@
         ].join('\n');
 
         const url =
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' +
-          encodeURIComponent(CONFIG.GEMINI_API_KEY);
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent';
 
         const resp = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': CONFIG.GEMINI_API_KEY
+          },
           body: JSON.stringify({
             contents: [{ parts: [{ text: promptText }] }],
             generationConfig: {
@@ -1432,7 +1439,7 @@
 
             function loadSavedApiKeys() {
         try {
-          const raw = localStorage.getItem('dealhawk_api_keys_v2');
+          const raw = localStorage.getItem('dealhawk_api_keys_v2_2');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed.geminiKey) CONFIG.GEMINI_API_KEY = parsed.geminiKey;
@@ -1462,7 +1469,7 @@
         if (sKey) CONFIG.GOOGLE_SEARCH_KEY = sKey;
         if (sCx) CONFIG.SEARCH_CX = sCx;
         try {
-          localStorage.setItem('dealhawk_api_keys_v2', JSON.stringify({
+          localStorage.setItem('dealhawk_api_keys_v2_2', JSON.stringify({
             geminiKey: CONFIG.GEMINI_API_KEY,
             searchKey: CONFIG.GOOGLE_SEARCH_KEY,
             searchCx: CONFIG.SEARCH_CX
@@ -1480,9 +1487,12 @@
         els.apiTestResult.textContent = 'جارٍ فحص اتصال Gemini و Google Search...';
         const results = [];
         try {
-          const gResp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(gKey), {
+          const gResp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': gKey
+            },
             body: JSON.stringify({ contents: [{ parts: [{ text: 'قل مرحبا فقط' }] }] })
           });
           if (gResp.ok) {
