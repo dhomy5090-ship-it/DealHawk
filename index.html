@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ديل هوك V1 | DealHawk V1 - صائد العروض الذكي</title>
+  <title>ديل هوك V1.1 | DealHawk V1.1 - صائد العروض الذكي</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,6 +46,46 @@
   <!-- Toast Container -->
   <div id="toastContainer" class="fixed top-4 left-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
+  <!-- Live Scan Activity Modal -->
+  <div id="scanLogModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel rounded-2xl max-w-2xl w-full max-h-[82vh] flex flex-col shadow-2xl border border-sky-500/25">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+          <h3 class="text-base font-bold text-white">نشاط الرادار المباشر</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnClearLiveLogs" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition">مسح</button>
+          <button id="btnCloseScanLogModal" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-rose-500/20 text-xs text-slate-200 transition">إغلاق</button>
+        </div>
+      </div>
+      <div id="scanLogBody" class="p-4 overflow-y-auto space-y-2 text-xs sm:text-sm">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Full History Modal -->
+  <div id="historyModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-indigo-500/25">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 class="text-base font-bold text-white">السجل الكامل لعمليات البحث والرادار</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnClearHistory" type="button" class="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs text-rose-300 transition">مسح السجل</button>
+          <button id="btnCloseHistoryModal" type="button" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 transition">إغلاق</button>
+        </div>
+      </div>
+      <div id="historyModalBody" class="p-4 overflow-y-auto space-y-3">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
   <!-- Header -->
   <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
@@ -59,7 +99,7 @@
           <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
             <span>ديل هوك</span>
             <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/25">DealHawk</span>
-            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">V1</span>
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">V1.1</span>
           </h1>
           <p class="text-xs text-slate-400">رادار ذكي لمراقبة الأسعار واقتناص العروض الموثوقة</p>
         </div>
@@ -95,48 +135,51 @@
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div>
           <h2 class="text-base sm:text-lg font-bold text-white">لوحة التحكم بالرادار</h2>
-          <p class="text-xs text-slate-400">أدخل تفاصيل المنتج المستهدف وسيقوم الرادار بالبحث والتحليل التلقائي عبر الويب</p>
+          <p class="text-xs text-slate-400">أدخل تفاصيل المنتج ونطاق السعر المطلوب وسيقوم الرادار بالبحث والتحليل التلقائي عبر الويب</p>
         </div>
         <div id="firebaseBadge" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300">
           جارٍ الاتصال بقاعدة البيانات...
         </div>
       </div>
 
-      <!-- Quick Presets -->
-      <div class="mb-4">
-        <span class="block text-xs font-semibold text-slate-400 mb-2">اختصارات سريعة للتخصصات المدعومة</span>
-        <div class="flex flex-wrap gap-2" id="presetChips">
-          <button type="button" data-preset="فلتر هواء ومساعدات هيونداي سوناتا" data-price="450" class="preset-btn px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">قطع هيونداي سوناتا</button>
-          <button type="button" data-preset="قطع غيار هيونداي النترا فحمات فرامل" data-price="300" class="preset-btn px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">قطع هيونداي النترا</button>
-          <button type="button" data-preset="قطع غيار فورد إكسبدشن طرمبة ماء" data-price="650" class="preset-btn px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">قطع فورد إكسبدشن</button>
-          <button type="button" data-preset="شاشة ألعاب 27 بوصة 165Hz" data-price="950" class="preset-btn px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">شاشات ألعاب</button>
-          <button type="button" data-preset="كرت شاشة RTX 4060 أو معالج Ryzen" data-price="1400" class="preset-btn px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">معدات الحواسيب</button>
-          <button type="button" data-preset="طابعة ثلاثية الأبعاد Creality Ender" data-price="1100" class="preset-btn px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">أدوات Creality</button>
+      <!-- History Bar (Replaces Quick Presets) -->
+      <div class="mb-4 p-3 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btnOpenHistory" type="button" class="px-3.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-bold text-indigo-200 transition flex items-center gap-2">
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>السجل</span>
+            <span id="historyCountBadge" class="px-1.5 py-0.5 rounded-md bg-indigo-500/25 text-[11px]">0</span>
+          </button>
+          <div id="recentHistoryChips" class="flex flex-wrap items-center gap-1.5">
+            <!-- Populated dynamically -->
+          </div>
         </div>
       </div>
 
-      <form id="radarForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="sm:col-span-2">
+      <form id="radarForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div class="sm:col-span-2 lg:col-span-3">
           <label for="productQuery" class="block text-xs font-semibold text-slate-300 mb-1.5">اسم المنتج أو القطعة المطلوبة</label>
           <input id="productQuery" type="text" required placeholder="مثال شاشة ألعاب 2K أو طابعة Creality K1" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
         </div>
 
         <div>
-          <label for="targetPrice" class="block text-xs font-semibold text-slate-300 mb-1.5">السعر المستهدف (ريال سعودي)</label>
-          <input id="targetPrice" type="number" min="1" step="any" required placeholder="مثال 950" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
+          <label for="minPrice" class="block text-xs font-semibold text-slate-300 mb-1.5">السعر من (ريال)</label>
+          <input id="minPrice" type="number" min="0" step="any" placeholder="مثال 700" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
         </div>
 
         <div>
-          <label for="intervalMinutes" class="block text-xs font-semibold text-slate-300 mb-1.5">دورة المراقبة المجدولة</label>
-          <select id="intervalMinutes" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white outline-none transition">
-            <option value="5">كل 5 دقائق</option>
-            <option value="15">كل 15 دقيقة</option>
-            <option value="30" selected>كل 30 دقيقة</option>
-            <option value="60">كل 60 دقيقة</option>
-          </select>
+          <label for="maxPrice" class="block text-xs font-semibold text-slate-300 mb-1.5">السعر إلى (ريال)</label>
+          <input id="maxPrice" type="number" min="1" step="any" required placeholder="مثال 1000" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
         </div>
 
-        <div class="sm:col-span-2 lg:col-span-4 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
+        <div>
+          <label for="intervalMinutes" class="block text-xs font-semibold text-slate-300 mb-1.5">الوقت بالدقائق (1 إلى 60)</label>
+          <input id="intervalMinutes" type="number" min="1" max="60" value="30" required class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white outline-none transition" />
+        </div>
+
+        <div class="sm:col-span-2 lg:col-span-6 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
           <div class="flex flex-wrap items-center gap-2.5">
             <button id="btnToggleRadar" type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-sm font-bold shadow-lg shadow-sky-500/20 transition flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -158,9 +201,15 @@
             </button>
           </div>
 
-          <div class="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400">
             <div>العد التنازلي للفحص القادم <span id="countdownDisplay" class="font-bold text-sky-300 mr-1">--</span></div>
-            <div>عمليات الفحص <span id="scanCountDisplay" class="font-bold text-white mr-1">0</span></div>
+            <button id="btnScanLog" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/15 border border-slate-700 hover:border-sky-500/40 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5" title="اضغط لعرض ما يفعله الرادار الآن">
+              <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>عمليات الفحص</span>
+              <span id="scanCountDisplay" class="font-bold text-sky-300 mr-0.5">0</span>
+            </button>
           </div>
         </div>
       </form>
@@ -172,6 +221,7 @@
         <span class="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></span>
         <span id="activityText" class="text-xs sm:text-sm text-sky-200 font-medium">جارٍ مسح نتائج البحث وتحليل الأسعار...</span>
       </div>
+      <button id="btnOpenLogFromBar" type="button" class="text-xs font-bold text-sky-300 hover:text-sky-200 underline underline-offset-4">عرض التفاصيل</button>
     </section>
 
     <!-- Filter & Stats Row -->
@@ -184,7 +234,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <select id="filterDeals" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-200 outline-none">
           <option value="all">جميع العروض</option>
-          <option value="matched">مطابقة للسعر المستهدف فقط</option>
+          <option value="matched">مطابقة للنطاق السعري فقط</option>
         </select>
         <button id="btnClearLocal" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 transition">
           تحديث القائمة
@@ -232,6 +282,8 @@
         scanCount: 0,
         isScanning: false,
         deals: [],
+        liveLogs: [],
+        searchHistory: [],
         db: null,
         firebaseReady: false,
         audioCtx: null
@@ -242,6 +294,19 @@
       // ==========================================================
       const els = {
         toastContainer: document.getElementById('toastContainer'),
+        scanLogModal: document.getElementById('scanLogModal'),
+        scanLogBody: document.getElementById('scanLogBody'),
+        btnScanLog: document.getElementById('btnScanLog'),
+        btnOpenLogFromBar: document.getElementById('btnOpenLogFromBar'),
+        btnCloseScanLogModal: document.getElementById('btnCloseScanLogModal'),
+        btnClearLiveLogs: document.getElementById('btnClearLiveLogs'),
+        historyModal: document.getElementById('historyModal'),
+        historyModalBody: document.getElementById('historyModalBody'),
+        btnOpenHistory: document.getElementById('btnOpenHistory'),
+        btnCloseHistoryModal: document.getElementById('btnCloseHistoryModal'),
+        btnClearHistory: document.getElementById('btnClearHistory'),
+        historyCountBadge: document.getElementById('historyCountBadge'),
+        recentHistoryChips: document.getElementById('recentHistoryChips'),
         radarStatusBadge: document.getElementById('radarStatusBadge'),
         radarDot: document.getElementById('radarDot'),
         radarStatusText: document.getElementById('radarStatusText'),
@@ -250,7 +315,8 @@
         firebaseBadge: document.getElementById('firebaseBadge'),
         radarForm: document.getElementById('radarForm'),
         productQuery: document.getElementById('productQuery'),
-        targetPrice: document.getElementById('targetPrice'),
+        minPrice: document.getElementById('minPrice'),
+        maxPrice: document.getElementById('maxPrice'),
         intervalMinutes: document.getElementById('intervalMinutes'),
         btnToggleRadar: document.getElementById('btnToggleRadar'),
         btnToggleRadarText: document.getElementById('btnToggleRadarText'),
@@ -284,6 +350,18 @@
           .replace(/'/g, '&#39;');
       }
 
+      function formatTime(ts) {
+        try {
+          return new Date(ts).toLocaleTimeString('ar-SA', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+        } catch (e) {
+          return '';
+        }
+      }
+
       function saveLocalDeals(deals) {
         try {
           localStorage.setItem('dealhawk_deals_v1', JSON.stringify(deals.slice(0, 60)));
@@ -295,6 +373,23 @@
       function loadLocalDeals() {
         try {
           const raw = localStorage.getItem('dealhawk_deals_v1');
+          return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveSearchHistory(history) {
+        try {
+          localStorage.setItem('dealhawk_history_v1', JSON.stringify(history.slice(0, 50)));
+        } catch (e) {
+          // Ignore storage quota errors
+        }
+      }
+
+      function loadSearchHistory() {
+        try {
+          const raw = localStorage.getItem('dealhawk_history_v1');
           return raw ? JSON.parse(raw) : [];
         } catch (e) {
           return [];
@@ -321,7 +416,120 @@
       }
 
       // ==========================================================
-      // 5. Audio Alert & Browser Notifications
+      // 5. Live Scan Log & History UI
+      // ==========================================================
+      function addLiveLog(message, level) {
+        state.liveLogs.unshift({
+          id: Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          time: formatTime(Date.now()),
+          message: sanitizeArabicNoColon(message),
+          level: level || 'info'
+        });
+        if (state.liveLogs.length > 80) {
+          state.liveLogs.length = 80;
+        }
+        if (!els.scanLogModal.classList.contains('hidden')) {
+          renderLiveLogs();
+        }
+      }
+
+      function renderLiveLogs() {
+        if (!state.liveLogs.length) {
+          els.scanLogBody.innerHTML =
+            '<div class="text-center py-8 text-slate-400">لا توجد عمليات مسجلة بعد. شغّل الرادار أو اضغط فحص فوري الآن لمتابعة الخطوات مباشرة.</div>';
+          return;
+        }
+        const badges = {
+          info: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
+          success: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+          warn: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+          error: 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+        };
+        els.scanLogBody.innerHTML = state.liveLogs
+          .map(function (log) {
+            const cls = badges[log.level] || badges.info;
+            return (
+              '<div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start justify-between gap-3">' +
+              '<p class="text-slate-200 leading-relaxed">' + escapeHtml(log.message) + '</p>' +
+              '<span class="shrink-0 px-2 py-0.5 rounded-md border text-[11px] font-semibold ' + cls + '">' + escapeHtml(log.time) + '</span>' +
+              '</div>'
+            );
+          })
+          .join('');
+      }
+
+      function recordHistoryEntry(query, minPrice, maxPrice, totalFound, matchedCount) {
+        const entry = {
+          id: 'hist_' + Date.now(),
+          query: query,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+          totalFound: totalFound,
+          matchedCount: matchedCount,
+          timestamp: Date.now()
+        };
+        state.searchHistory.unshift(entry);
+        saveSearchHistory(state.searchHistory);
+        renderRecentHistoryChips();
+        if (!els.historyModal.classList.contains('hidden')) {
+          renderHistoryModal();
+        }
+      }
+
+      function renderRecentHistoryChips() {
+        els.historyCountBadge.textContent = String(state.searchHistory.length);
+        if (!state.searchHistory.length) {
+          els.recentHistoryChips.innerHTML =
+            '<span class="text-xs text-slate-500">لا توجد عمليات بحث سابقة بعد</span>';
+          return;
+        }
+        const uniqueRecent = [];
+        const seen = {};
+        for (let i = 0; i < state.searchHistory.length; i++) {
+          const item = state.searchHistory[i];
+          if (!seen[item.query]) {
+            seen[item.query] = true;
+            uniqueRecent.push(item);
+          }
+          if (uniqueRecent.length >= 4) break;
+        }
+        els.recentHistoryChips.innerHTML = uniqueRecent
+          .map(function (item) {
+            return (
+              '<button type="button" data-hist-id="' + escapeHtml(item.id) + '" class="recent-hist-chip px-3 py-1 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">' +
+              escapeHtml(item.query) +
+              ' (' + escapeHtml(String(item.minPrice)) + ' - ' + escapeHtml(String(item.maxPrice)) + ' ريال)' +
+              '</button>'
+            );
+          })
+          .join('');
+      }
+
+      function renderHistoryModal() {
+        if (!state.searchHistory.length) {
+          els.historyModalBody.innerHTML =
+            '<div class="text-center py-10 text-slate-400 text-sm">السجل فارغ حالياً. سيتم حفظ كل عملية بحث تلقائياً هنا.</div>';
+          return;
+        }
+        els.historyModalBody.innerHTML = state.searchHistory
+          .map(function (item) {
+            const dateStr = new Date(item.timestamp).toLocaleString('ar-SA');
+            return (
+              '<div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-3">' +
+              '<div class="space-y-1">' +
+              '<div class="text-sm font-bold text-white">' + escapeHtml(item.query) + '</div>' +
+              '<div class="text-xs text-slate-400">النطاق السعري من ' + escapeHtml(String(item.minPrice)) + ' إلى ' + escapeHtml(String(item.maxPrice)) + ' ريال — المطابق ' + escapeHtml(String(item.matchedCount)) + ' من أصل ' + escapeHtml(String(item.totalFound)) + '</div>' +
+              '<div class="text-[11px] text-slate-500">' + escapeHtml(sanitizeArabicNoColon(dateStr)) + '</div>' +
+              '</div>' +
+              '<button type="button" data-rerun-id="' + escapeHtml(item.id) + '" class="hist-rerun-btn px-3.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-xs font-bold text-sky-200 transition">إعادة البحث</button>' +
+              '</div>'
+            );
+          })
+          .join('');
+      }
+
+      // ==========================================================
+      // 6. Audio Alert & Browser Notifications
       // ==========================================================
       function playAlertSound() {
         try {
@@ -366,7 +574,7 @@
       }
 
       // ==========================================================
-      // 6. Firebase Firestore Initialization & Persistence
+      // 7. Firebase Firestore Initialization & Persistence
       // ==========================================================
       function initFirebase() {
         try {
@@ -405,7 +613,8 @@
               productName: sanitizeArabicNoColon(d.productName || ''),
               storeName: sanitizeArabicNoColon(d.storeName || ''),
               finalPrice: Number(d.finalPrice) || 0,
-              targetPrice: Number(d.targetPrice) || 0,
+              minPrice: Number(d.minPrice) || 0,
+              maxPrice: Number(d.maxPrice || d.targetPrice) || 0,
               reasonAndReliability: sanitizeArabicNoColon(d.reasonAndReliability || ''),
               url: d.url || '#',
               matched: Boolean(d.matched),
@@ -418,7 +627,7 @@
             renderDeals();
           }
         } catch (err) {
-          // Fallback to local deals if Firestore rules restrict read
+          // Fallback to local deals
         }
       }
 
@@ -429,7 +638,8 @@
             productName: deal.productName,
             storeName: deal.storeName,
             finalPrice: deal.finalPrice,
-            targetPrice: deal.targetPrice,
+            minPrice: deal.minPrice,
+            maxPrice: deal.maxPrice,
             reasonAndReliability: deal.reasonAndReliability,
             url: deal.url,
             matched: deal.matched,
@@ -442,11 +652,13 @@
       }
 
       // ==========================================================
-      // 7. Google Custom Search + Gemini API Pipeline
+      // 8. Google Custom Search + Gemini API Pipeline
       // ==========================================================
       async function searchGoogleProducts(query) {
         const excludedTerms = '-"action figure" -"فيكر" -"مجسم" -"تمثال"';
         const fullQuery = query + ' ' + excludedTerms + ' سعر شراء';
+        addLiveLog('إرسال استعلام البحث إلى Google Custom Search عن ' + query, 'info');
+
         const endpoint =
           'https://www.googleapis.com/customsearch/v1?key=' +
           encodeURIComponent(CONFIG.GOOGLE_SEARCH_KEY) +
@@ -461,10 +673,14 @@
           throw new Error('تعذر جلب نتائج البحث برقم حالة ' + resp.status);
         }
         const data = await resp.json();
-        return Array.isArray(data.items) ? data.items : [];
+        const items = Array.isArray(data.items) ? data.items : [];
+        addLiveLog('تم استلام ' + items.length + ' نتيجة من محرك البحث', 'info');
+        return items;
       }
 
-      async function analyzeWithGemini(searchItems, userQuery, targetPrice) {
+      async function analyzeWithGemini(searchItems, userQuery, minPrice, maxPrice) {
+        addLiveLog('تمرير النتائج إلى Gemini لتحليل الأسعار وفحص موثوقية البائعين واستبعاد المجسمات', 'info');
+
         const simplifiedItems = searchItems.map(function (item, idx) {
           return {
             index: idx + 1,
@@ -477,7 +693,7 @@
 
         const promptText = [
           'أنت محلل أسعار ومشتريات ذكي لتطبيق ديل هوك.',
-          'المطلوب تحليل نتائج البحث التالية لمنتج (' + userQuery + ') بسعر مستهدف (' + targetPrice + ' ريال سعودي).',
+          'المطلوب تحليل نتائج البحث التالية لمنتج (' + userQuery + ') ضمن نطاق سعر من ' + minPrice + ' إلى ' + maxPrice + ' ريال سعودي.',
           'شروط صارمة يجب الالتزام بها حرفياً بدون أي استثناء',
           '1 اكتب جميع النصوص باللغة العربية فقط باستثناء كلمة Creality تكتب بالإنجليزية.',
           '2 يُمنع منعاً باتاً استخدام علامة النقطتين الرأسيتين في أي نص.',
@@ -491,7 +707,7 @@
           'finalPrice رقم السعر النهائي المعتمد بالريال السعودي كقيمة رقمية فقط',
           'reasonAndReliability سبب الترشيح وموثوقية البائع بدون أي نقطتين رأسيتين',
           'url الرابط المباشر للمنتج من النتائج',
-          'matched قيمة منطقية true إذا كان السعر أقل من أو يساوي ' + targetPrice + ' والبائع موثوقاً وإلا false',
+          'matched قيمة منطقية true إذا كان السعر بين ' + minPrice + ' و ' + maxPrice + ' ريال والبائع موثوقاً وإلا false',
           'البيانات المراد تحليلها',
           JSON.stringify(simplifiedItems)
         ].join('\n');
@@ -543,13 +759,15 @@
           })
           .map(function (entry) {
             const numericPrice = Number(String(entry.finalPrice || '0').replace(/[^\d.]/g, '')) || 0;
-            const isMatched = Boolean(entry.matched) || (numericPrice > 0 && numericPrice <= targetPrice);
+            const inRange = numericPrice > 0 && numericPrice >= minPrice && numericPrice <= maxPrice;
+            const isMatched = Boolean(entry.matched) || inRange;
             return {
               id: 'deal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
               productName: sanitizeArabicNoColon(entry.productName || userQuery),
               storeName: sanitizeArabicNoColon(entry.storeName || 'متجر إلكتروني موثوق'),
               finalPrice: numericPrice,
-              targetPrice: targetPrice,
+              minPrice: minPrice,
+              maxPrice: maxPrice,
               reasonAndReliability: sanitizeArabicNoColon(
                 entry.reasonAndReliability || 'بائع موثوق بتقييم مرتفع ومطابق للمواصفات المطلوبة'
               ),
@@ -561,35 +779,50 @@
       }
 
       // ==========================================================
-      // 8. Scan Execution
+      // 9. Scan Execution
       // ==========================================================
+      function getValidatedInputs() {
+        const query = els.productQuery.value.trim();
+        const minPrice = els.minPrice.value.trim() === '' ? 0 : Number(els.minPrice.value);
+        const maxPrice = Number(els.maxPrice.value);
+        if (!query || isNaN(minPrice) || minPrice < 0 || !maxPrice || maxPrice <= 0) {
+          showToast('يرجى إدخال اسم المنتج ونطاق السعر بشكل صحيح', 'warn');
+          return null;
+        }
+        if (minPrice > maxPrice) {
+          showToast('الحد الأدنى للسعر يجب أن يكون أقل من أو يساوي الحد الأقصى', 'warn');
+          return null;
+        }
+        return { query: query, minPrice: minPrice, maxPrice: maxPrice };
+      }
+
       async function runRadarScan() {
         if (state.isScanning) return;
-        const query = els.productQuery.value.trim();
-        const targetPrice = Number(els.targetPrice.value);
-
-        if (!query || !targetPrice || targetPrice <= 0) {
-          showToast('يرجى إدخال اسم المنتج والسعر المستهدف بشكل صحيح', 'warn');
-          return;
-        }
+        const inputs = getValidatedInputs();
+        if (!inputs) return;
 
         state.isScanning = true;
         state.scanCount += 1;
         els.scanCountDisplay.textContent = String(state.scanCount);
         els.activityBar.classList.remove('hidden');
-        els.activityText.textContent = 'جارٍ البحث عن ' + query + ' وتحليل موثوقية البائعين...';
+        els.activityText.textContent = 'جارٍ البحث عن ' + inputs.query + ' ضمن النطاق ' + inputs.minPrice + ' إلى ' + inputs.maxPrice + ' ريال...';
+        addLiveLog('بدء الفحص رقم ' + state.scanCount + ' للمنتج ' + inputs.query + ' بنطاق سعر ' + inputs.minPrice + ' إلى ' + inputs.maxPrice + ' ريال', 'info');
 
         try {
-          const searchItems = await searchGoogleProducts(query);
+          const searchItems = await searchGoogleProducts(inputs.query);
           if (!searchItems.length) {
+            addLiveLog('انتهى الفحص دون العثور على نتائج بحث جديدة', 'warn');
+            recordHistoryEntry(inputs.query, inputs.minPrice, inputs.maxPrice, 0, 0);
             showToast('لم يتم العثور على نتائج بحث جديدة لهذا المنتج حالياً', 'info');
             return;
           }
 
           els.activityText.textContent = 'تم جلب ' + searchItems.length + ' نتائج وجارٍ الفحص الذكي عبر Gemini...';
-          const analyzedDeals = await analyzeWithGemini(searchItems, query, targetPrice);
+          const analyzedDeals = await analyzeWithGemini(searchItems, inputs.query, inputs.minPrice, inputs.maxPrice);
 
           if (!analyzedDeals.length) {
+            addLiveLog('تم استبعاد جميع النتائج لعدم مطابقتها شروط الموثوقية أو لكونها مجسمات', 'warn');
+            recordHistoryEntry(inputs.query, inputs.minPrice, inputs.maxPrice, 0, 0);
             showToast('لم تطابق النتائج شروط الموثوقية أو الاستبعاد المحددة', 'info');
             return;
           }
@@ -604,25 +837,32 @@
               state.deals.unshift(deal);
               if (deal.matched) {
                 matchedCount += 1;
-                await saveDealToFirestore(deal);
+                const saved = await saveDealToFirestore(deal);
+                addLiveLog(
+                  'تم رصد عرض مطابق في ' + deal.storeName + ' بسعر ' + deal.finalPrice + ' ريال' + (saved ? ' وحُفظ في Firestore' : ''),
+                  'success'
+                );
               }
             }
           }
 
           saveLocalDeals(state.deals);
           renderDeals();
+          recordHistoryEntry(inputs.query, inputs.minPrice, inputs.maxPrice, analyzedDeals.length, matchedCount);
 
           if (matchedCount > 0) {
             playAlertSound();
             triggerBrowserNotification(
               'عرض مطابق في ديل هوك',
-              'تم رصد ' + matchedCount + ' عرض بسعر مطابق للهدف ' + targetPrice + ' ريال'
+              'تم رصد ' + matchedCount + ' عرض ضمن النطاق ' + inputs.minPrice + ' إلى ' + inputs.maxPrice + ' ريال'
             );
-            showToast('تم رصد وحفظ ' + matchedCount + ' عرض مطابق للسعر المستهدف', 'success');
+            showToast('تم رصد وحفظ ' + matchedCount + ' عرض مطابق للنطاق السعري', 'success');
           } else {
-            showToast('اكتمل الفحص وتم عرض ' + analyzedDeals.length + ' نتائج دون تطابق مع السعر المستهدف', 'info');
+            addLiveLog('اكتمل التحليل لعدد ' + analyzedDeals.length + ' عروض لكنها خارج النطاق السعري المطلوب', 'info');
+            showToast('اكتمل الفحص وتم عرض ' + analyzedDeals.length + ' نتائج خارج النطاق السعري', 'info');
           }
         } catch (err) {
+          addLiveLog('حدث خطأ أثناء الفحص ' + (err.message || ''), 'error');
           showToast(err.message || 'حدث خطأ أثناء الفحص يرجى التحقق من المفاتيح أو الاتصال', 'error');
         } finally {
           state.isScanning = false;
@@ -631,7 +871,7 @@
       }
 
       // ==========================================================
-      // 9. Radar Timer & Countdown
+      // 10. Radar Timer & Countdown
       // ==========================================================
       function updateCountdownUI() {
         if (!state.radarActive || !state.nextScanTimestamp) {
@@ -647,12 +887,12 @@
       }
 
       function startRadar() {
-        const query = els.productQuery.value.trim();
-        const targetPrice = Number(els.targetPrice.value);
-        const minutes = Number(els.intervalMinutes.value) || 30;
+        const inputs = getValidatedInputs();
+        if (!inputs) return;
 
-        if (!query || !targetPrice || targetPrice <= 0) {
-          showToast('يرجى إدخال اسم المنتج والسعر المستهدف لتشغيل الرادار', 'warn');
+        let minutes = Number(els.intervalMinutes.value);
+        if (isNaN(minutes) || minutes < 1 || minutes > 60) {
+          showToast('يرجى تحديد مدة المراقبة بين 1 و 60 دقيقة', 'warn');
           return;
         }
 
@@ -669,6 +909,7 @@
         els.btnToggleRadarText.textContent = 'تحديث إعدادات الرادار';
         els.btnStopRadar.classList.remove('hidden');
 
+        addLiveLog('تم تشغيل الرادار المستمر بدورة فحص كل ' + minutes + ' دقيقة', 'success');
         runRadarScan();
 
         state.radarTimerId = setInterval(function () {
@@ -701,12 +942,13 @@
         updateCountdownUI();
 
         if (!silent) {
+          addLiveLog('تم إيقاف المراقبة التلقائية للرادار يدوياً', 'warn');
           showToast('تم إيقاف المراقبة التلقائية للرادار', 'info');
         }
       }
 
       // ==========================================================
-      // 10. Card Rendering
+      // 11. Card Rendering
       // ==========================================================
       function renderDeals() {
         const filter = els.filterDeals.value;
@@ -726,7 +968,7 @@
             '<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>' +
             '</div>' +
             '<h4 class="text-base font-bold text-white mb-1">لا توجد عروض مرصودة بعد</h4>' +
-            '<p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">اختر أحد الاختصارات السريعة أو اكتب اسم المنتج واضغط على تشغيل الرادار المستمر أو فحص فوري الآن</p>' +
+            '<p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">أدخل اسم المنتج ونطاق السعر المطلوب ثم اضغط على تشغيل الرادار المستمر أو فحص فوري الآن</p>' +
             '</div>';
           return;
         }
@@ -734,7 +976,7 @@
         els.dealsGrid.innerHTML = visibleDeals
           .map(function (deal) {
             const matchBadge = deal.matched
-              ? '<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">مطابق للسعر المستهدف</span>'
+              ? '<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">مطابق للنطاق السعري</span>'
               : '<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 text-slate-300 border border-slate-700">قيد المراقبة</span>';
 
             const priceDisplay = deal.finalPrice > 0 ? deal.finalPrice + ' ريال' : 'السعر داخل المتجر';
@@ -783,16 +1025,8 @@
       }
 
       // ==========================================================
-      // 11. Event Listeners
+      // 12. Event Listeners
       // ==========================================================
-      document.querySelectorAll('.preset-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          els.productQuery.value = btn.getAttribute('data-preset') || '';
-          els.targetPrice.value = btn.getAttribute('data-price') || '';
-          els.productQuery.focus();
-        });
-      });
-
       els.radarForm.addEventListener('submit', function (e) {
         e.preventDefault();
         startRadar();
@@ -804,6 +1038,73 @@
 
       els.btnStopRadar.addEventListener('click', function () {
         stopRadar(false);
+      });
+
+      els.btnScanLog.addEventListener('click', function () {
+        renderLiveLogs();
+        els.scanLogModal.classList.remove('hidden');
+      });
+
+      els.btnOpenLogFromBar.addEventListener('click', function () {
+        renderLiveLogs();
+        els.scanLogModal.classList.remove('hidden');
+      });
+
+      els.btnCloseScanLogModal.addEventListener('click', function () {
+        els.scanLogModal.classList.add('hidden');
+      });
+
+      els.btnClearLiveLogs.addEventListener('click', function () {
+        state.liveLogs = [];
+        renderLiveLogs();
+      });
+
+      els.btnOpenHistory.addEventListener('click', function () {
+        renderHistoryModal();
+        els.historyModal.classList.remove('hidden');
+      });
+
+      els.btnCloseHistoryModal.addEventListener('click', function () {
+        els.historyModal.classList.add('hidden');
+      });
+
+      els.btnClearHistory.addEventListener('click', function () {
+        state.searchHistory = [];
+        saveSearchHistory([]);
+        renderRecentHistoryChips();
+        renderHistoryModal();
+        showToast('تم مسح السجل بنجاح', 'info');
+      });
+
+      els.recentHistoryChips.addEventListener('click', function (e) {
+        const chip = e.target.closest('.recent-hist-chip');
+        if (!chip) return;
+        const id = chip.getAttribute('data-hist-id');
+        const found = state.searchHistory.find(function (h) {
+          return h.id === id;
+        });
+        if (found) {
+          els.productQuery.value = found.query;
+          els.minPrice.value = found.minPrice;
+          els.maxPrice.value = found.maxPrice;
+          els.productQuery.focus();
+        }
+      });
+
+      els.historyModalBody.addEventListener('click', function (e) {
+        const btn = e.target.closest('.hist-rerun-btn');
+        if (!btn) return;
+        const id = btn.getAttribute('data-rerun-id');
+        const found = state.searchHistory.find(function (h) {
+          return h.id === id;
+        });
+        if (found) {
+          els.productQuery.value = found.query;
+          els.minPrice.value = found.minPrice;
+          els.maxPrice.value = found.maxPrice;
+          els.historyModal.classList.add('hidden');
+          runRadarScan();
+        }
       });
 
       els.btnTestAudio.addEventListener('click', function () {
@@ -837,10 +1138,12 @@
       });
 
       // ==========================================================
-      // 12. Boot
+      // 13. Boot
       // ==========================================================
       state.deals = loadLocalDeals();
+      state.searchHistory = loadSearchHistory();
       renderDeals();
+      renderRecentHistoryChips();
       initFirebase();
     })();
   </script>
