@@ -2,8 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ديل هوك V1.1 | DealHawk V1.1 - صائد العروض الذكي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1120" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ديل هوك" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>ديل هوك V2 | DealHawk V2 - صائد العروض الذكي</title>
+  <link id="appFavicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230ea5e9'/%3E%3Cstop offset='100%25' stop-color='%234f46e5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='28' fill='url(%23g)'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='rgba(255,255,255,0.22)' stroke-width='3'/%3E%3Cpath d='M30 68 C42 42, 65 34, 92 38 C78 48, 72 56, 84 64 C66 64, 54 72, 42 86 C44 74, 38 70, 30 68 Z' fill='%23ffffff'/%3E%3Ccircle cx='72' cy='47' r='3.5' fill='%230b1120'/%3E%3C/svg%3E" />
+  <link id="appleTouchIcon" rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230ea5e9'/%3E%3Cstop offset='100%25' stop-color='%234f46e5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='120' height='120' rx='28' fill='url(%23g)'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='rgba(255,255,255,0.22)' stroke-width='3'/%3E%3Cpath d='M30 68 C42 42, 65 34, 92 38 C78 48, 72 56, 84 64 C66 64, 54 72, 42 86 C44 74, 38 70, 30 68 Z' fill='%23ffffff'/%3E%3Ccircle cx='72' cy='47' r='3.5' fill='%230b1120'/%3E%3C/svg%3E" />
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,19 +18,29 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
-    body {
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    html, body {
       font-family: 'Cairo', 'Inter', sans-serif;
       background-color: #0b1120;
       color: #f1f5f9;
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      padding-top: var(--safe-top);
+      padding-bottom: calc(var(--safe-bottom) + 16px);
     }
     .glass-panel {
-      background: rgba(15, 23, 42, 0.78);
+      background: rgba(15, 23, 42, 0.82);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(148, 163, 184, 0.14);
     }
     .deal-card {
-      background: linear-gradient(160deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+      background: linear-gradient(160deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.96));
       border: 1px solid rgba(56, 189, 248, 0.18);
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
@@ -44,7 +61,27 @@
 <body class="min-h-screen antialiased selection:bg-sky-500/30 selection:text-sky-100">
 
   <!-- Toast Container -->
-  <div id="toastContainer" class="fixed top-4 left-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+  <div id="toastContainer" class="fixed top-4 left-4 right-4 sm:right-auto z-50 flex flex-col gap-2 sm:max-w-sm w-auto pointer-events-none"></div>
+
+  <!-- PWA Install Guide Modal -->
+  <div id="installModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel rounded-2xl max-w-md w-full p-5 space-y-4 border border-sky-500/30 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">تثبيت تطبيق ديل هوك بدون حواف المتصفح</h3>
+        <button id="btnCloseInstallModal" type="button" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300">إغلاق</button>
+      </div>
+      <div class="space-y-2.5 text-xs sm:text-sm text-slate-200 leading-relaxed">
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+          <p class="font-bold text-sky-300 mb-1">أندرويد وجالكسي (Chrome أو Samsung Internet)</p>
+          <p>اضغط على قائمة المتصفح العلوية أو السفلية ثم اختر إضافة إلى الشاشة الرئيسية أو تثبيت التطبيق ليفتح بشاشة كاملة بدون شريط البحث السفلي.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+          <p class="font-bold text-indigo-300 mb-1">آيفون (Safari)</p>
+          <p>اضغط على زر المشاركة في أسفل المتصفح ثم اختر إضافة إلى الصفحة الرئيسية ليفتح كتطبيق مستقل تماماً بدون حواف.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Live Scan Activity Modal -->
   <div id="scanLogModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -88,38 +125,56 @@
 
   <!-- Header -->
   <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 4a6 6 0 106 6 6 6 0 00-6-6zm0 4a2 2 0 102 2 2 2 0 00-2-2z" />
-          </svg>
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <!-- Custom DealHawk Falcon/Radar Logo -->
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/25 shrink-0">
+            <svg class="w-7 h-7 text-white" viewBox="0 0 120 120" fill="none">
+              <circle cx="60" cy="60" r="42" stroke="rgba(255,255,255,0.28)" stroke-width="4" />
+              <path d="M26 70 C40 40, 66 32, 96 36 C80 47, 74 56, 86 65 C66 65, 52 74, 38 88 C41 75, 35 71, 26 70 Z" fill="currentColor" />
+              <circle cx="73" cy="46" r="4" fill="#0b1120" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-1.5 flex-wrap">
+              <span>ديل هوك</span>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/25">DealHawk</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">V2</span>
+            </h1>
+            <p class="text-[11px] sm:text-xs text-slate-400">رادار ذكي لمراقبة الأسعار واقتناص العروض الموثوقة</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-            <span>ديل هوك</span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/25">DealHawk</span>
-            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">V1.1</span>
-          </h1>
-          <p class="text-xs text-slate-400">رادار ذكي لمراقبة الأسعار واقتناص العروض الموثوقة</p>
+
+        <div id="radarStatusBadge" class="flex sm:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-[11px] font-semibold text-slate-300 shrink-0">
+          <span id="radarDotMobile" class="w-2 h-2 rounded-full bg-slate-500"></span>
+          <span id="radarStatusTextMobile">متوقف</span>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <div id="radarStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-semibold text-slate-300">
+      <!-- Mobile & PC Action Toolbar -->
+      <div class="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2">
+        <div id="radarStatusBadgeDesktop" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-semibold text-slate-300">
           <span id="radarDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
           <span id="radarStatusText">الرادار متوقف</span>
         </div>
 
-        <button id="btnNotifications" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <button id="btnInstallApp" type="button" class="px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-[11px] sm:text-xs font-bold text-sky-200 transition flex items-center justify-center gap-1.5">
+          <svg class="w-4 h-4 text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>تثبيت بالجوال</span>
+        </button>
+
+        <button id="btnNotifications" type="button" class="px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] sm:text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-1.5">
+          <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
           <span>تفعيل الإشعارات</span>
         </button>
 
-        <button id="btnTestAudio" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <button id="btnTestAudio" type="button" class="px-2.5 py-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] sm:text-xs font-semibold text-slate-200 transition flex items-center justify-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
           </svg>
           <span>اختبار التنبيه</span>
@@ -128,24 +183,24 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5">
 
     <!-- Control Panel -->
-    <section class="glass-panel rounded-2xl p-5 sm:p-6 shadow-xl">
+    <section class="glass-panel rounded-2xl p-4 sm:p-6 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div>
-          <h2 class="text-base sm:text-lg font-bold text-white">لوحة التحكم بالرادار</h2>
-          <p class="text-xs text-slate-400">أدخل تفاصيل المنتج ونطاق السعر المطلوب وسيقوم الرادار بالبحث والتحليل التلقائي عبر الويب</p>
+          <h2 class="text-sm sm:text-lg font-bold text-white">لوحة التحكم بالرادار الذكي</h2>
+          <p class="text-[11px] sm:text-xs text-slate-400">يدعم البحث المزدوج التلقائي وتجاوز خطأ 403 بالبحث الحي عبر الويب</p>
         </div>
-        <div id="firebaseBadge" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300">
+        <div id="firebaseBadge" class="text-[11px] sm:text-xs px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300">
           جارٍ الاتصال بقاعدة البيانات...
         </div>
       </div>
 
-      <!-- History Bar (Replaces Quick Presets) -->
-      <div class="mb-4 p-3 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-wrap items-center justify-between gap-2.5">
-        <div class="flex flex-wrap items-center gap-2">
-          <button id="btnOpenHistory" type="button" class="px-3.5 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-bold text-indigo-200 transition flex items-center gap-2">
+      <!-- History Bar -->
+      <div class="mb-4 p-2.5 sm:p-3 rounded-xl bg-slate-900/60 border border-slate-800/90 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-2 w-full">
+          <button id="btnOpenHistory" type="button" class="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-bold text-indigo-200 transition flex items-center gap-1.5 shrink-0">
             <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -158,52 +213,52 @@
         </div>
       </div>
 
-      <form id="radarForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-        <div class="sm:col-span-2 lg:col-span-3">
+      <form id="radarForm" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
+        <div class="col-span-2 lg:col-span-3">
           <label for="productQuery" class="block text-xs font-semibold text-slate-300 mb-1.5">اسم المنتج أو القطعة المطلوبة</label>
-          <input id="productQuery" type="text" required placeholder="مثال شاشة ألعاب 2K أو طابعة Creality K1" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
+          <input id="productQuery" type="text" required placeholder="مثال شاشة ألعاب 27 بوصة 165Hz أو طابعة Creality" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
         </div>
 
-        <div>
+        <div class="col-span-1">
           <label for="minPrice" class="block text-xs font-semibold text-slate-300 mb-1.5">السعر من (ريال)</label>
-          <input id="minPrice" type="number" min="0" step="any" placeholder="مثال 700" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
+          <input id="minPrice" type="number" min="0" step="any" placeholder="500" class="w-full px-3 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
         </div>
 
-        <div>
+        <div class="col-span-1">
           <label for="maxPrice" class="block text-xs font-semibold text-slate-300 mb-1.5">السعر إلى (ريال)</label>
-          <input id="maxPrice" type="number" min="1" step="any" required placeholder="مثال 1000" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
+          <input id="maxPrice" type="number" min="1" step="any" required placeholder="900" class="w-full px-3 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white placeholder-slate-500 outline-none transition" />
         </div>
 
-        <div>
+        <div class="col-span-2 lg:col-span-1">
           <label for="intervalMinutes" class="block text-xs font-semibold text-slate-300 mb-1.5">الوقت بالدقائق (1 إلى 60)</label>
-          <input id="intervalMinutes" type="number" min="1" max="60" value="30" required class="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white outline-none transition" />
+          <input id="intervalMinutes" type="number" min="1" max="60" value="5" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 text-sm text-white outline-none transition" />
         </div>
 
-        <div class="sm:col-span-2 lg:col-span-6 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
-          <div class="flex flex-wrap items-center gap-2.5">
-            <button id="btnToggleRadar" type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-sm font-bold shadow-lg shadow-sky-500/20 transition flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <div class="col-span-2 lg:col-span-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-800/80">
+          <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+            <button id="btnToggleRadar" type="submit" class="col-span-2 sm:col-span-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-sky-500/20 transition flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span id="btnToggleRadarText">تشغيل الرادار المستمر</span>
             </button>
 
-            <button id="btnScanNow" type="button" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-sm font-semibold transition flex items-center gap-2">
-              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <button id="btnScanNow" type="button" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4 text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <span>فحص فوري الآن</span>
             </button>
 
-            <button id="btnStopRadar" type="button" class="hidden px-4 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-sm font-semibold transition">
+            <button id="btnStopRadar" type="button" class="hidden px-3.5 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs sm:text-sm font-semibold transition text-center">
               إيقاف الرادار
             </button>
           </div>
 
-          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-            <div>العد التنازلي للفحص القادم <span id="countdownDisplay" class="font-bold text-sky-300 mr-1">--</span></div>
-            <button id="btnScanLog" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/15 border border-slate-700 hover:border-sky-500/40 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5" title="اضغط لعرض ما يفعله الرادار الآن">
+          <div class="flex items-center justify-between sm:justify-end gap-3 text-xs text-slate-400">
+            <div>الفحص القادم <span id="countdownDisplay" class="font-bold text-sky-300 mr-1">--</span></div>
+            <button id="btnScanLog" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-sky-500/15 border border-slate-700 hover:border-sky-500/40 text-xs font-semibold text-slate-200 transition flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
@@ -218,16 +273,16 @@
     <!-- Live Activity Bar -->
     <section id="activityBar" class="hidden glass-panel rounded-xl px-4 py-3 border border-sky-500/25 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <span class="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></span>
+        <span class="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin shrink-0"></span>
         <span id="activityText" class="text-xs sm:text-sm text-sky-200 font-medium">جارٍ مسح نتائج البحث وتحليل الأسعار...</span>
       </div>
-      <button id="btnOpenLogFromBar" type="button" class="text-xs font-bold text-sky-300 hover:text-sky-200 underline underline-offset-4">عرض التفاصيل</button>
+      <button id="btnOpenLogFromBar" type="button" class="text-xs font-bold text-sky-300 hover:text-sky-200 underline underline-offset-4 shrink-0">عرض التفاصيل</button>
     </section>
 
     <!-- Filter & Stats Row -->
-    <section class="flex flex-wrap items-center justify-between gap-3">
+    <section class="flex flex-wrap items-center justify-between gap-2.5">
       <div class="flex items-center gap-2">
-        <h3 class="text-base sm:text-lg font-bold text-white">العروض المكتشفة والمحفوظة</h3>
+        <h3 class="text-sm sm:text-lg font-bold text-white">العروض المكتشفة والمحفوظة</h3>
         <span id="dealsCountBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-500/15 text-sky-300 border border-sky-500/25">0</span>
       </div>
 
@@ -243,7 +298,7 @@
     </section>
 
     <!-- Cards Grid -->
-    <section id="dealsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <section id="dealsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
       <!-- Empty state rendered by JS -->
     </section>
 
@@ -272,7 +327,50 @@
       };
 
       // ==========================================================
-      // 2. State Management
+      // 2. Dynamic PWA Manifest & Standalone Setup (Borderless Mobile)
+      // ==========================================================
+      function setupPWA() {
+        try {
+          const svgIcon =
+            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>" +
+            "<defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#0ea5e9'/><stop offset='100%' stop-color='#4f46e5'/></linearGradient></defs>" +
+            "<rect width='512' height='512' rx='115' fill='url(#g)'/>" +
+            "<circle cx='256' cy='256' r='165' fill='none' stroke='rgba(255,255,255,0.22)' stroke-width='14'/>" +
+            "<path d='M120 292 C175 170, 280 138, 405 155 C340 202, 315 240, 365 276 C280 276, 222 315, 165 375 C178 318, 152 300, 120 292 Z' fill='#ffffff'/>" +
+            "<circle cx='310' cy='198' r='16' fill='#0b1120'/>" +
+            "</svg>";
+          const encodedIcon = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgIcon);
+
+          const manifestObj = {
+            name: 'ديل هوك V2 - صائد العروض الذكي',
+            short_name: 'ديل هوك',
+            description: 'رادار ذكي لمراقبة الأسعار واقتناص العروض الموثوقة',
+            start_url: './DealHawk_V2.html',
+            display: 'standalone',
+            orientation: 'portrait',
+            background_color: '#0b1120',
+            theme_color: '#0b1120',
+            dir: 'rtl',
+            lang: 'ar',
+            icons: [
+              { src: encodedIcon, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+              { src: encodedIcon, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+            ]
+          };
+
+          const blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+          const manifestURL = URL.createObjectURL(blob);
+          const link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = manifestURL;
+          document.head.appendChild(link);
+        } catch (e) {
+          // Ignore manifest blob errors
+        }
+      }
+
+      // ==========================================================
+      // 3. State Management
       // ==========================================================
       const state = {
         radarActive: false,
@@ -286,14 +384,18 @@
         searchHistory: [],
         db: null,
         firebaseReady: false,
-        audioCtx: null
+        audioCtx: null,
+        deferredInstallPrompt: null
       };
 
       // ==========================================================
-      // 3. DOM Elements
+      // 4. DOM Elements
       // ==========================================================
       const els = {
         toastContainer: document.getElementById('toastContainer'),
+        installModal: document.getElementById('installModal'),
+        btnInstallApp: document.getElementById('btnInstallApp'),
+        btnCloseInstallModal: document.getElementById('btnCloseInstallModal'),
         scanLogModal: document.getElementById('scanLogModal'),
         scanLogBody: document.getElementById('scanLogBody'),
         btnScanLog: document.getElementById('btnScanLog'),
@@ -307,9 +409,12 @@
         btnClearHistory: document.getElementById('btnClearHistory'),
         historyCountBadge: document.getElementById('historyCountBadge'),
         recentHistoryChips: document.getElementById('recentHistoryChips'),
-        radarStatusBadge: document.getElementById('radarStatusBadge'),
+        radarStatusBadgeDesktop: document.getElementById('radarStatusBadgeDesktop'),
         radarDot: document.getElementById('radarDot'),
         radarStatusText: document.getElementById('radarStatusText'),
+        radarStatusBadgeMobile: document.getElementById('radarStatusBadge'),
+        radarDotMobile: document.getElementById('radarDotMobile'),
+        radarStatusTextMobile: document.getElementById('radarStatusTextMobile'),
         btnNotifications: document.getElementById('btnNotifications'),
         btnTestAudio: document.getElementById('btnTestAudio'),
         firebaseBadge: document.getElementById('firebaseBadge'),
@@ -333,7 +438,7 @@
       };
 
       // ==========================================================
-      // 4. Utilities (Strict No-Colon Sanitizer & Safe Storage)
+      // 5. Utilities (Strict No-Colon Sanitizer & Safe Storage)
       // ==========================================================
       function sanitizeArabicNoColon(text) {
         if (!text || typeof text !== 'string') return '';
@@ -356,7 +461,7 @@
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit'
-          });
+          }).replace(/:/g, ' ');
         } catch (e) {
           return '';
         }
@@ -364,7 +469,7 @@
 
       function saveLocalDeals(deals) {
         try {
-          localStorage.setItem('dealhawk_deals_v1', JSON.stringify(deals.slice(0, 60)));
+          localStorage.setItem('dealhawk_deals_v2', JSON.stringify(deals.slice(0, 60)));
         } catch (e) {
           // Ignore storage quota errors
         }
@@ -372,7 +477,7 @@
 
       function loadLocalDeals() {
         try {
-          const raw = localStorage.getItem('dealhawk_deals_v1');
+          const raw = localStorage.getItem('dealhawk_deals_v2') || localStorage.getItem('dealhawk_deals_v1');
           return raw ? JSON.parse(raw) : [];
         } catch (e) {
           return [];
@@ -381,7 +486,7 @@
 
       function saveSearchHistory(history) {
         try {
-          localStorage.setItem('dealhawk_history_v1', JSON.stringify(history.slice(0, 50)));
+          localStorage.setItem('dealhawk_history_v2', JSON.stringify(history.slice(0, 50)));
         } catch (e) {
           // Ignore storage quota errors
         }
@@ -389,7 +494,7 @@
 
       function loadSearchHistory() {
         try {
-          const raw = localStorage.getItem('dealhawk_history_v1');
+          const raw = localStorage.getItem('dealhawk_history_v2') || localStorage.getItem('dealhawk_history_v1');
           return raw ? JSON.parse(raw) : [];
         } catch (e) {
           return [];
@@ -416,7 +521,7 @@
       }
 
       // ==========================================================
-      // 5. Live Scan Log & History UI
+      // 6. Live Scan Log & History UI
       // ==========================================================
       function addLiveLog(message, level) {
         state.liveLogs.unshift({
@@ -496,7 +601,7 @@
         els.recentHistoryChips.innerHTML = uniqueRecent
           .map(function (item) {
             return (
-              '<button type="button" data-hist-id="' + escapeHtml(item.id) + '" class="recent-hist-chip px-3 py-1 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-xs text-slate-200 transition">' +
+              '<button type="button" data-hist-id="' + escapeHtml(item.id) + '" class="recent-hist-chip px-2.5 py-1 rounded-xl bg-slate-800/90 hover:bg-sky-500/20 border border-slate-700 hover:border-sky-500/40 text-[11px] sm:text-xs text-slate-200 transition">' +
               escapeHtml(item.query) +
               ' (' + escapeHtml(String(item.minPrice)) + ' - ' + escapeHtml(String(item.maxPrice)) + ' ريال)' +
               '</button>'
@@ -529,7 +634,7 @@
       }
 
       // ==========================================================
-      // 6. Audio Alert & Browser Notifications
+      // 7. Audio Alert & Browser Notifications
       // ==========================================================
       function playAlertSound() {
         try {
@@ -574,7 +679,7 @@
       }
 
       // ==========================================================
-      // 7. Firebase Firestore Initialization & Persistence
+      // 8. Firebase Firestore Initialization & Persistence
       // ==========================================================
       function initFirebase() {
         try {
@@ -588,7 +693,7 @@
           state.db = firebase.firestore();
           state.firebaseReady = true;
           els.firebaseBadge.textContent = 'متصل بقاعدة بيانات Firestore';
-          els.firebaseBadge.className = 'text-xs px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300';
+          els.firebaseBadge.className = 'text-[11px] sm:text-xs px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300';
           fetchDealsFromFirestore();
         } catch (err) {
           state.firebaseReady = false;
@@ -652,11 +757,11 @@
       }
 
       // ==========================================================
-      // 8. Google Custom Search + Gemini API Pipeline
+      // 9. Dual-Engine Search + Gemini Grounding Fallback (Fixes 403)
       // ==========================================================
       async function searchGoogleProducts(query) {
         const excludedTerms = '-"action figure" -"فيكر" -"مجسم" -"تمثال"';
-        const fullQuery = query + ' ' + excludedTerms + ' سعر شراء';
+        const fullQuery = query + ' ' + excludedTerms + ' سعر ريال السعودية';
         addLiveLog('إرسال استعلام البحث إلى Google Custom Search عن ' + query, 'info');
 
         const endpoint =
@@ -670,12 +775,134 @@
 
         const resp = await fetch(endpoint);
         if (!resp.ok) {
-          throw new Error('تعذر جلب نتائج البحث برقم حالة ' + resp.status);
+          let errReason = '';
+          try {
+            const errJson = await resp.json();
+            if (errJson && errJson.error && errJson.error.message) {
+              errReason = errJson.error.message;
+            }
+          } catch (e) {
+            // Ignore parse error
+          }
+          const statusError = new Error('تعذر جلب نتائج Custom Search برقم حالة ' + resp.status + (errReason ? ' بسبب ' + errReason : ''));
+          statusError.status = resp.status;
+          throw statusError;
         }
         const data = await resp.json();
         const items = Array.isArray(data.items) ? data.items : [];
-        addLiveLog('تم استلام ' + items.length + ' نتيجة من محرك البحث', 'info');
+        addLiveLog('تم استلام ' + items.length + ' نتيجة من محرك البحث Custom Search', 'info');
         return items;
+      }
+
+      function normalizeDealsList(parsed, userQuery, minPrice, maxPrice) {
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+          .filter(function (entry) {
+            const combined = ((entry.productName || '') + ' ' + (entry.reasonAndReliability || '')).toLowerCase();
+            return (
+              combined.indexOf('action figure') === -1 &&
+              combined.indexOf('فيكر') === -1 &&
+              combined.indexOf('مجسم') === -1
+            );
+          })
+          .map(function (entry) {
+            const numericPrice = Number(String(entry.finalPrice || '0').replace(/[^\d.]/g, '')) || 0;
+            const inRange = numericPrice > 0 && numericPrice >= minPrice && numericPrice <= maxPrice;
+            const isMatched = Boolean(entry.matched) || inRange;
+            const cleanStore = sanitizeArabicNoColon(entry.storeName || 'متجر إلكتروني موثوق');
+            const fallbackSearchUrl = 'https://www.google.com/search?q=' + encodeURIComponent((entry.productName || userQuery) + ' ' + cleanStore);
+            return {
+              id: 'deal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+              productName: sanitizeArabicNoColon(entry.productName || userQuery),
+              storeName: cleanStore,
+              finalPrice: numericPrice,
+              minPrice: minPrice,
+              maxPrice: maxPrice,
+              reasonAndReliability: sanitizeArabicNoColon(
+                entry.reasonAndReliability || 'بائع موثوق بتقييم مرتفع ومطابق للمواصفات المطلوبة'
+              ),
+              url: entry.url && String(entry.url).startsWith('http') ? entry.url : fallbackSearchUrl,
+              matched: isMatched,
+              createdAt: Date.now()
+            };
+          });
+      }
+
+      async function searchAndAnalyzeDirectlyWithGemini(userQuery, minPrice, maxPrice) {
+        addLiveLog('تفعيل محرك البحث البديل عبر Gemini Google Search لتجاوز خطأ Custom Search 403', 'warn');
+
+        const promptText = [
+          'أنت محلل أسعار ومشتريات ذكي لتطبيق ديل هوك في السعودية.',
+          'ابحث عن عروض حقيقية للمنتج (' + userQuery + ') في المتاجر الموثوقة مثل أمازون السعودية ونون وجرير وإكسترا وعلي إكسبريس ضمن نطاق سعر من ' + minPrice + ' إلى ' + maxPrice + ' ريال سعودي.',
+          'شروط صارمة يجب الالتزام بها حرفياً بدون أي استثناء',
+          '1 اكتب جميع النصوص باللغة العربية فقط باستثناء كلمة Creality تكتب بالإنجليزية.',
+          '2 يُمنع منعاً باتاً استخدام علامة النقطتين الرأسيتين في أي نص.',
+          '3 استبعد تماماً أي مجسمات أو فيكرات أو دمى عرض خصوصاً عند البحث عن منتجات Creality أو أدوات الطباعة ثلاثية الأبعاد.',
+          '4 استبعد البائعين المجهولين وركز على المتاجر المعروفة وتقييم البائع.',
+          '5 أعد مصفوفة JSON صالحة فقط تحتوي على 3 إلى 6 عروض حقيقية ومحدثة بدون أي نص خارج JSON.',
+          'كل عنصر داخل المصفوفة يجب أن يحتوي على الحقول التالية',
+          'productName اسم المنتج بدقة بالعربية مع السماح بكلمة Creality بالإنجليزية',
+          'storeName اسم المتجر الموصى به بالعربية مثل أمازون السعودية أو نون أو مكتبة جرير أو إكسترا',
+          'finalPrice رقم السعر النهائي بالريال السعودي كقيمة رقمية فقط',
+          'reasonAndReliability سبب الترشيح وموثوقية البائع بدون أي نقطتين رأسيتين',
+          'url رابط المنتج المباشر أو رابط البحث في المتجر',
+          'matched قيمة منطقية true إذا كان السعر بين ' + minPrice + ' و ' + maxPrice + ' ريال والبائع موثوقاً وإلا false'
+        ].join('\n');
+
+        const endpoint =
+          'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' +
+          encodeURIComponent(CONFIG.GEMINI_API_KEY);
+
+        // Try with google_search grounding tool first, fallback to standard generation if tool not supported by key
+        let resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }],
+            tools: [{ google_search: {} }],
+            generationConfig: {
+              temperature: 0.2
+            }
+          })
+        });
+
+        if (!resp.ok) {
+          resp = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: promptText }] }],
+              generationConfig: {
+                temperature: 0.2,
+                responseMimeType: 'application/json'
+              }
+            })
+          });
+        }
+
+        if (!resp.ok) {
+          throw new Error('تعذر الاتصال بمحرك Gemini برقم حالة ' + resp.status);
+        }
+
+        const data = await resp.json();
+        const parts =
+          data &&
+          data.candidates &&
+          data.candidates[0] &&
+          data.candidates[0].content &&
+          data.candidates[0].content.parts
+            ? data.candidates[0].content.parts
+            : [];
+
+        let rawText = '';
+        for (let i = 0; i < parts.length; i++) {
+          if (parts[i].text) rawText += parts[i].text;
+        }
+
+        const jsonMatch = rawText.match(/\[[\s\S]*\]/);
+        const cleaned = jsonMatch ? jsonMatch[0] : rawText.replace(/```json|```/gi, '').trim();
+        const parsed = JSON.parse(cleaned);
+        return normalizeDealsList(parsed, userQuery, minPrice, maxPrice);
       }
 
       async function analyzeWithGemini(searchItems, userQuery, minPrice, maxPrice) {
@@ -746,40 +973,11 @@
 
         const cleaned = rawText.replace(/```json|```/gi, '').trim();
         const parsed = JSON.parse(cleaned);
-        if (!Array.isArray(parsed)) return [];
-
-        return parsed
-          .filter(function (entry) {
-            const combined = ((entry.productName || '') + ' ' + (entry.reasonAndReliability || '')).toLowerCase();
-            return (
-              combined.indexOf('action figure') === -1 &&
-              combined.indexOf('فيكر') === -1 &&
-              combined.indexOf('مجسم') === -1
-            );
-          })
-          .map(function (entry) {
-            const numericPrice = Number(String(entry.finalPrice || '0').replace(/[^\d.]/g, '')) || 0;
-            const inRange = numericPrice > 0 && numericPrice >= minPrice && numericPrice <= maxPrice;
-            const isMatched = Boolean(entry.matched) || inRange;
-            return {
-              id: 'deal_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-              productName: sanitizeArabicNoColon(entry.productName || userQuery),
-              storeName: sanitizeArabicNoColon(entry.storeName || 'متجر إلكتروني موثوق'),
-              finalPrice: numericPrice,
-              minPrice: minPrice,
-              maxPrice: maxPrice,
-              reasonAndReliability: sanitizeArabicNoColon(
-                entry.reasonAndReliability || 'بائع موثوق بتقييم مرتفع ومطابق للمواصفات المطلوبة'
-              ),
-              url: entry.url && String(entry.url).startsWith('http') ? entry.url : '#',
-              matched: isMatched,
-              createdAt: Date.now()
-            };
-          });
+        return normalizeDealsList(parsed, userQuery, minPrice, maxPrice);
       }
 
       // ==========================================================
-      // 9. Scan Execution
+      // 10. Scan Execution
       // ==========================================================
       function getValidatedInputs() {
         const query = els.productQuery.value.trim();
@@ -809,19 +1007,23 @@
         addLiveLog('بدء الفحص رقم ' + state.scanCount + ' للمنتج ' + inputs.query + ' بنطاق سعر ' + inputs.minPrice + ' إلى ' + inputs.maxPrice + ' ريال', 'info');
 
         try {
-          const searchItems = await searchGoogleProducts(inputs.query);
-          if (!searchItems.length) {
-            addLiveLog('انتهى الفحص دون العثور على نتائج بحث جديدة', 'warn');
-            recordHistoryEntry(inputs.query, inputs.minPrice, inputs.maxPrice, 0, 0);
-            showToast('لم يتم العثور على نتائج بحث جديدة لهذا المنتج حالياً', 'info');
-            return;
+          let analyzedDeals = [];
+          try {
+            const searchItems = await searchGoogleProducts(inputs.query);
+            if (searchItems.length > 0) {
+              els.activityText.textContent = 'تم جلب ' + searchItems.length + ' نتائج وجارٍ الفحص الذكي عبر Gemini...';
+              analyzedDeals = await analyzeWithGemini(searchItems, inputs.query, inputs.minPrice, inputs.maxPrice);
+            } else {
+              analyzedDeals = await searchAndAnalyzeDirectlyWithGemini(inputs.query, inputs.minPrice, inputs.maxPrice);
+            }
+          } catch (cseError) {
+            addLiveLog(cseError.message || 'تعذر الاتصال بمحرك Custom Search وجارٍ التحويل للمحرك البديل', 'warn');
+            els.activityText.textContent = 'جارٍ البحث المباشر عبر محرك Gemini الذكي لتجاوز قيود Custom Search...';
+            analyzedDeals = await searchAndAnalyzeDirectlyWithGemini(inputs.query, inputs.minPrice, inputs.maxPrice);
           }
 
-          els.activityText.textContent = 'تم جلب ' + searchItems.length + ' نتائج وجارٍ الفحص الذكي عبر Gemini...';
-          const analyzedDeals = await analyzeWithGemini(searchItems, inputs.query, inputs.minPrice, inputs.maxPrice);
-
           if (!analyzedDeals.length) {
-            addLiveLog('تم استبعاد جميع النتائج لعدم مطابقتها شروط الموثوقية أو لكونها مجسمات', 'warn');
+            addLiveLog('لم تطابق النتائج شروط الموثوقية أو الاستبعاد المحددة', 'warn');
             recordHistoryEntry(inputs.query, inputs.minPrice, inputs.maxPrice, 0, 0);
             showToast('لم تطابق النتائج شروط الموثوقية أو الاستبعاد المحددة', 'info');
             return;
@@ -831,7 +1033,7 @@
           for (let i = 0; i < analyzedDeals.length; i++) {
             const deal = analyzedDeals[i];
             const exists = state.deals.some(function (d) {
-              return d.url === deal.url && d.finalPrice === deal.finalPrice;
+              return d.productName === deal.productName && d.storeName === deal.storeName && d.finalPrice === deal.finalPrice;
             });
             if (!exists) {
               state.deals.unshift(deal);
@@ -858,8 +1060,8 @@
             );
             showToast('تم رصد وحفظ ' + matchedCount + ' عرض مطابق للنطاق السعري', 'success');
           } else {
-            addLiveLog('اكتمل التحليل لعدد ' + analyzedDeals.length + ' عروض لكنها خارج النطاق السعري المطلوب', 'info');
-            showToast('اكتمل الفحص وتم عرض ' + analyzedDeals.length + ' نتائج خارج النطاق السعري', 'info');
+            addLiveLog('اكتمل التحليل لعدد ' + analyzedDeals.length + ' عروض وتم إضافتها للقائمة', 'info');
+            showToast('اكتمل الفحص وتم عرض ' + analyzedDeals.length + ' نتائج', 'info');
           }
         } catch (err) {
           addLiveLog('حدث خطأ أثناء الفحص ' + (err.message || ''), 'error');
@@ -871,7 +1073,7 @@
       }
 
       // ==========================================================
-      // 10. Radar Timer & Countdown
+      // 11. Radar Timer & Countdown
       // ==========================================================
       function updateCountdownUI() {
         if (!state.radarActive || !state.nextScanTimestamp) {
@@ -884,6 +1086,30 @@
         const secs = totalSec % 60;
         els.countdownDisplay.textContent =
           String(mins).padStart(2, '0') + ' د ' + String(secs).padStart(2, '0') + ' ث';
+      }
+
+      function updateStatusIndicators(active, minutes) {
+        if (active) {
+          els.radarDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 radar-dot-active';
+          els.radarStatusText.textContent = 'الرادار نشط كل ' + minutes + ' د';
+          els.radarStatusBadgeDesktop.className =
+            'hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-300';
+
+          els.radarDotMobile.className = 'w-2 h-2 rounded-full bg-emerald-400 radar-dot-active';
+          els.radarStatusTextMobile.textContent = 'نشط كل ' + minutes + ' د';
+          els.radarStatusBadgeMobile.className =
+            'flex sm:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-semibold text-emerald-300 shrink-0';
+        } else {
+          els.radarDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
+          els.radarStatusText.textContent = 'الرادار متوقف';
+          els.radarStatusBadgeDesktop.className =
+            'hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-semibold text-slate-300';
+
+          els.radarDotMobile.className = 'w-2 h-2 rounded-full bg-slate-500';
+          els.radarStatusTextMobile.textContent = 'متوقف';
+          els.radarStatusBadgeMobile.className =
+            'flex sm:hidden items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-[11px] font-semibold text-slate-300 shrink-0';
+        }
       }
 
       function startRadar() {
@@ -902,10 +1128,7 @@
         state.radarActive = true;
         state.nextScanTimestamp = Date.now() + intervalMs;
 
-        els.radarDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 radar-dot-active';
-        els.radarStatusText.textContent = 'الرادار نشط كل ' + minutes + ' دقيقة';
-        els.radarStatusBadge.className =
-          'flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-xs font-semibold text-emerald-300';
+        updateStatusIndicators(true, minutes);
         els.btnToggleRadarText.textContent = 'تحديث إعدادات الرادار';
         els.btnStopRadar.classList.remove('hidden');
 
@@ -933,10 +1156,7 @@
         state.radarActive = false;
         state.nextScanTimestamp = null;
 
-        els.radarDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
-        els.radarStatusText.textContent = 'الرادار متوقف';
-        els.radarStatusBadge.className =
-          'flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 text-xs font-semibold text-slate-300';
+        updateStatusIndicators(false, 0);
         els.btnToggleRadarText.textContent = 'تشغيل الرادار المستمر';
         els.btnStopRadar.classList.add('hidden');
         updateCountdownUI();
@@ -948,7 +1168,7 @@
       }
 
       // ==========================================================
-      // 11. Card Rendering
+      // 12. Card Rendering
       // ==========================================================
       function renderDeals() {
         const filter = els.filterDeals.value;
@@ -963,7 +1183,7 @@
 
         if (!visibleDeals.length) {
           els.dealsGrid.innerHTML =
-            '<div class="col-span-full glass-panel rounded-2xl p-10 text-center border border-dashed border-slate-700">' +
+            '<div class="col-span-full glass-panel rounded-2xl p-8 sm:p-10 text-center border border-dashed border-slate-700">' +
             '<div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-slate-800 flex items-center justify-center text-sky-400">' +
             '<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>' +
             '</div>' +
@@ -991,7 +1211,7 @@
                 : '<span class="w-full py-2.5 px-4 rounded-xl bg-slate-800 text-slate-400 text-sm font-semibold text-center block">الرابط غير متاح</span>';
 
             return (
-              '<article class="deal-card rounded-2xl p-5 flex flex-col justify-between gap-4">' +
+              '<article class="deal-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between gap-4">' +
               '<div class="space-y-3">' +
               '<div class="flex items-center justify-between gap-2">' +
               '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-500/15 text-sky-300 border border-sky-500/25">' +
@@ -999,12 +1219,12 @@
               '</span>' +
               matchBadge +
               '</div>' +
-              '<h4 class="text-base font-extrabold text-white leading-snug">' +
+              '<h4 class="text-sm sm:text-base font-extrabold text-white leading-snug">' +
               escapeHtml(sanitizeArabicNoColon(deal.productName)) +
               '</h4>' +
               '<div class="flex items-baseline justify-between bg-slate-900/80 rounded-xl px-3.5 py-2.5 border border-slate-800">' +
               '<span class="text-xs text-slate-400 font-semibold">السعر النهائي المعتمد</span>' +
-              '<span class="text-lg font-extrabold text-emerald-400">' +
+              '<span class="text-base sm:text-lg font-extrabold text-emerald-400">' +
               escapeHtml(priceDisplay) +
               '</span>' +
               '</div>' +
@@ -1025,8 +1245,28 @@
       }
 
       // ==========================================================
-      // 12. Event Listeners
+      // 13. Event Listeners
       // ==========================================================
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        state.deferredInstallPrompt = e;
+      });
+
+      els.btnInstallApp.addEventListener('click', function () {
+        if (state.deferredInstallPrompt) {
+          state.deferredInstallPrompt.prompt();
+          state.deferredInstallPrompt.userChoice.then(function () {
+            state.deferredInstallPrompt = null;
+          });
+        } else {
+          els.installModal.classList.remove('hidden');
+        }
+      });
+
+      els.btnCloseInstallModal.addEventListener('click', function () {
+        els.installModal.classList.add('hidden');
+      });
+
       els.radarForm.addEventListener('submit', function (e) {
         e.preventDefault();
         startRadar();
@@ -1138,8 +1378,9 @@
       });
 
       // ==========================================================
-      // 13. Boot
+      // 14. Boot
       // ==========================================================
+      setupPWA();
       state.deals = loadLocalDeals();
       state.searchHistory = loadSearchHistory();
       renderDeals();
